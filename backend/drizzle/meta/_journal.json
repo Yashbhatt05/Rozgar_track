@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1770361697980,
+      "tag": "0000_steady_bloodstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770363719275,
+      "tag": "0001_mature_santa_claus",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770364018679,
+      "tag": "0002_wet_psylocke",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1770368837630,
+      "tag": "0003_add_metrics_and_health_tables",
+      "breakpoints": true
+    }
+  ]
+}
