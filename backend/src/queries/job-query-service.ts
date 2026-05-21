@@ -471,6 +471,55 @@ export class JobQueryService {
   }
 
   /**
+   * Get a single job by identity_hash
+   */
+  static async getJobByIdentityHash(
+    hash: string
+  ): Promise<QueryJob | null> {
+    const startTime = Date.now();
+
+    // Fetch the job
+    const job = await db
+      .select()
+      .from(jobs)
+      .where(eq(jobs.identity_hash, hash))
+      .then((rows) => rows[0] || null);
+
+    if (!job) return null;
+
+    // Fetch classification
+    const classification = await db
+      .select()
+      .from(jobClassifications)
+      .where(eq(jobClassifications.identity_hash, hash))
+      .then((rows) => rows[0] || null);
+
+    return {
+      identity_hash: job.identity_hash,
+      id: job.identity_hash,
+      company_id: job.company_id,
+      company_name: job.company_name,
+      source_type: job.source_type as SourceType,
+      ingestion_strategy: job.ingestion_strategy,
+      title: job.title,
+      location: job.location,
+      url: job.url,
+      first_seen_at: new Date(job.first_seen_at),
+      last_seen_at: new Date(job.last_seen_at),
+      is_active: job.is_active,
+      classification: classification
+        ? {
+            category: classification.category as JobCategory,
+            role: classification.role as JobRole,
+            confidence: classification.confidence,
+            classified_at: new Date(classification.classified_at),
+          }
+        : undefined,
+      metadata: job.metadata as Record<string, any>,
+    };
+  }
+
+  /**
    * Search jobs by title or location
    */
   static async searchJobs(

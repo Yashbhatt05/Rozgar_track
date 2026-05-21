@@ -1,5 +1,6 @@
 import express from 'express';
 import { HealthService } from './metrics';
+import { createJobQueryRouter } from '../queries/job-query-router';
 
 /**
  * HealthEndpoints
@@ -166,31 +167,46 @@ export function createHealthRouter(): express.Router {
 }
 
 /**
- * Start health endpoints server
+ * Start the API server (health + job query endpoints)
  */
-export async function startHealthServer(port: number = 3001): Promise<void> {
+export async function startApiServer(port: number = 3001): Promise<void> {
   const app = express();
-  const router = createHealthRouter();
+  const healthRouter = createHealthRouter();
+  const jobQueryRouter = createJobQueryRouter();
 
   // Mount health endpoints at root
-  app.use('/', router);
+  app.use('/', healthRouter);
+
+  // Mount job query endpoints under /api
+  app.use('/api', jobQueryRouter);
 
   // 404 handler
   app.use((req, res) => {
     res.status(404).json({
       error: 'Not found',
       path: req.path,
-      available: ['/health', '/metrics', '/metrics/adapters', '/metrics/quality'],
+      available: [
+        '/health',
+        '/metrics',
+        '/metrics/adapters',
+        '/metrics/quality',
+        '/api/jobs/active-software',
+        '/api/jobs/:id',
+      ],
     });
   });
 
   return new Promise((resolve) => {
     app.listen(port, () => {
-      console.log(`\n📊 Health endpoints running on http://localhost:${port}`);
-      console.log(`   GET /health - System health status`);
-      console.log(`   GET /metrics - Last run summary`);
-      console.log(`   GET /metrics/adapters - Per-adapter performance`);
-      console.log(`   GET /metrics/quality - Data quality signals\n`);
+      console.log(`\n🚀 API server running on http://localhost:${port}`);
+      console.log(`   Health:`);
+      console.log(`   GET /health - System health`);
+      console.log(`   GET /metrics - Run metrics`);
+      console.log(`   GET /metrics/adapters - Adapter performance`);
+      console.log(`   GET /metrics/quality - Data quality`);
+      console.log(`   Jobs:`);
+      console.log(`   GET /api/jobs/active-software - Active software jobs`);
+      console.log(`   GET /api/jobs/:id - Job details\n`);
       resolve();
     });
   });

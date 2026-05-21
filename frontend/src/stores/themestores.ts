@@ -1,15 +1,23 @@
 import { makeAutoObservable } from "mobx";
 
 class ThemeStore {
-    theme: string = "retro"
+    theme: string = "dark"; // Start with dark mode
 
     constructor() {
-      makeAutoObservable(this)
+        makeAutoObservable(this);
     }
 
-    setTheme(theme: string) {
-        this.theme = theme
+    setDark() {
+        this.theme = "dark";
+    }
+
+    setLight() {
+        this.theme = "light";
+    }
+
+    toggle() {
+        this.theme = this.theme === "dark" ? "light" : "dark";
     }
 }
 
-export const themeStore = new ThemeStore()
+export const themeStore = new ThemeStore();

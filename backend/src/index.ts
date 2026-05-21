@@ -6,7 +6,7 @@ import { orchestrator } from './ingestion';
 import { JobPersistence } from './persistence';
 import { JobClassifier } from './classification';
 import { JobQueryService } from './queries';
-import { MetricsCollector, startHealthServer } from './observability';
+import { MetricsCollector, startApiServer } from './observability';
 import { eq } from 'drizzle-orm';
 
 async function main() {
@@ -15,6 +15,11 @@ async function main() {
   const metrics = MetricsCollector.createRun(runId);
 
   console.log(`\n🚀 Starting ingestion run: ${runId}\n`);
+
+  // Start the API immediately so the frontend can render even while ingestion is running.
+  console.log(`🚀 Starting API Server...`);
+  await startApiServer(3001);
+
   // Clear existing companies for fresh test
   try {
     const allCompanies = await db.select().from(companies);
@@ -258,10 +263,6 @@ async function main() {
     metrics.markComplete();
     await metrics.persistMetrics();
     console.log(`✓ Metrics persisted for run: ${runId}\n`);
-
-    // Start health endpoints server
-    console.log(`🏥 Starting Health Check Server...`);
-    await startHealthServer(3001);
 
   } catch (error) {
     console.error('Error during pipeline:', error);
